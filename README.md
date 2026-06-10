@@ -116,7 +116,7 @@ wildfire-monitor/
 
 **Niloofar** – GIS & Environmental Data Analyst  
 📍 Spain | 🌍 Remote-friendly  
-🔗 [LinkedIn](https://linkedin.com/in/your-profile) | [GitHub](https://github.com/your-username)
+🔗 [LinkedIn](https://linkedin.com/www.linkedin.com/in/niloofar-haghi-99aa2a137) | [GitHub](https://github.com/your-username)
 
 ---
 
