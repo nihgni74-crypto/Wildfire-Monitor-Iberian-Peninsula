@@ -1,0 +1,16 @@
+# Streamlit Community Cloud configuration
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+
+[theme]
+base = "dark"
+primaryColor = "#FF6B35"
+backgroundColor = "#080C14"
+secondaryBackgroundColor = "#131929"
+textColor = "#E8EAF0"
+font = "sans serif"
+
+[browser]
+gatherUsageStats = false
