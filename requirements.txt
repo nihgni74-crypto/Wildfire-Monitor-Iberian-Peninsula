@@ -7,4 +7,4 @@ plotly
 numpy
 python-dotenv
 prophet
-geopy
+reverse_geocoder
