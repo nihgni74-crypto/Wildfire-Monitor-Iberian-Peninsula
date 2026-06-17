@@ -6,3 +6,5 @@ streamlit-folium==0.20.0
 plotly==5.22.0
 numpy==1.26.4
 python-dotenv==1.0.1
+prophet>=1.1.5
+geopy>=2.4.1
