@@ -25,7 +25,7 @@ TEXT_COLOR = "#E8EAF0"
 BASE_LAYOUT = dict(
     paper_bgcolor=DARK_BG,
     plot_bgcolor=CARD_BG,
-    font=dict(family="Inter, Segoe UI, sans-serif", color=TEXT_COLOR, size=12),
+    font=dict(family="Roboto, 'Open Sans', sans-serif", color=TEXT_COLOR, size=12),
     margin=dict(l=10, r=10, t=40, b=10),
     legend=dict(bgcolor="rgba(0,0,0,0)", font=dict(size=11)),
     xaxis=dict(gridcolor=GRID_COLOR, linecolor=GRID_COLOR, zerolinecolor=GRID_COLOR),
@@ -66,14 +66,14 @@ def fires_per_day_bar(df: pd.DataFrame) -> go.Figure:
             colorscale=[[0, "#FF6B35"], [0.5, "#FF4500"], [1, "#800080"]],
             line=dict(width=0),
         ),
-        hovertemplate="<b>%{x}</b><br>🔥 %{y} hotspots<extra></extra>",
+        hovertemplate="<b>%{x}</b><br> %{y} hotspots<extra></extra>",
         text=daily["count"],
         textposition="outside",
         textfont=dict(size=10, color=TEXT_COLOR),
     ))
     fig.update_layout(
         **BASE_LAYOUT,
-        title=dict(text="🔥 Daily Hotspot Count", font=dict(size=14, color=ACCENT2)),
+        title=dict(text="Daily Hotspot Count", font=dict(size=14, color=ACCENT2)),
         xaxis_title="Date",
         yaxis_title="Hotspots",
         bargap=0.3,
@@ -104,7 +104,7 @@ def frp_histogram(df: pd.DataFrame) -> go.Figure:
     ))
     fig.update_layout(
         **BASE_LAYOUT,
-        title=dict(text="📊 FRP Distribution (MW)", font=dict(size=14, color=ACCENT2)),
+        title=dict(text="FRP Distribution (MW)", font=dict(size=14, color=ACCENT2)),
         xaxis_title="Fire Radiative Power (MW)",
         yaxis_title="Count",
         bargap=0.05,
@@ -141,7 +141,7 @@ def intensity_donut(df: pd.DataFrame) -> go.Figure:
     ))
     fig.update_layout(
         **BASE_LAYOUT,
-        title=dict(text="🍩 Intensity Distribution", font=dict(size=14, color=ACCENT2)),
+        title=dict(text="Intensity Distribution", font=dict(size=14, color=ACCENT2)),
         showlegend=False,
         annotations=[dict(
             text=f"<b>{len(df)}</b><br><span style='font-size:9px'>total</span>",
@@ -179,7 +179,7 @@ def frp_scatter_map(df: pd.DataFrame) -> go.Figure:
             opacity=0.85,
         ),
         hovertemplate=(
-            "<b>🔥 Fire Hotspot</b><br>"
+            "<b>Fire Hotspot</b><br>"
             "Lat: %{lat:.4f}  Lon: %{lon:.4f}<br>"
             "FRP: %{marker.color:.1f} MW<extra></extra>"
         ),
@@ -192,7 +192,7 @@ def frp_scatter_map(df: pd.DataFrame) -> go.Figure:
             zoom=5,
         ),
         margin=dict(l=0, r=0, t=30, b=0),
-        title=dict(text="🗺️ Scatter Map (FRP)", font=dict(size=14, color=ACCENT2)),
+        title=dict(text="Scatter Map (FRP)", font=dict(size=14, color=ACCENT2)),
         height=400,
     )
     return fig
@@ -240,7 +240,7 @@ def hourly_polar(df: pd.DataFrame) -> go.Figure:
         ),
         font=dict(color=TEXT_COLOR),
         margin=dict(l=30, r=30, t=40, b=30),
-        title=dict(text="🕐 Hourly Detection Pattern", font=dict(size=14, color=ACCENT2)),
+        title=dict(text="Hourly Detection Pattern", font=dict(size=14, color=ACCENT2)),
     )
     return fig
 
@@ -316,13 +316,15 @@ def frp_time_series(df: pd.DataFrame) -> go.Figure:
 
 def top_fires_table(df: pd.DataFrame) -> pd.DataFrame:
     """Return top-10 fires by FRP as a formatted DataFrame."""
-    cols = [c for c in ["date_str", "latitude", "longitude", "frp",
+    cols = [c for c in ["date_str", "city", "region", "latitude", "longitude", "frp",
                          "brightness", "intensity", "confidence", "satellite"]
             if c in df.columns]
     top = df.nlargest(10, "frp")[cols].copy()
 
     rename = {
         "date_str":   "Date",
+        "city":       "City",
+        "region":     "Region",
         "latitude":   "Latitude",
         "longitude":  "Longitude",
         "frp":        "FRP (MW)",

@@ -135,7 +135,7 @@ def _add_markers(m: folium.Map, df: pd.DataFrame, small: bool = False) -> None:
         radius = 4 if small else float(row.get("marker_size", 8))
         popup  = _build_popup(row)
         tooltip = (
-            f"🔥 FRP: {row.get('frp', '?')} MW | "
+            f"FRP: {row.get('frp', '?')} MW | "
             f"{row.get('intensity', '?')} | "
             f"{row.get('date_str', '')}"
         )
@@ -168,7 +168,7 @@ def _add_clusters(m: folium.Map, df: pd.DataFrame) -> None:
     for _, row in df.iterrows():
         color  = _intensity_to_icon_color(row.get("intensity", "Low"))
         popup  = _build_popup(row)
-        tooltip = f"🔥 {row.get('intensity','?')} – FRP: {row.get('frp','?')} MW"
+        tooltip = f"{row.get('intensity','?')} – FRP: {row.get('frp','?')} MW"
 
         folium.Marker(
             location=[row["latitude"], row["longitude"]],
@@ -194,38 +194,40 @@ def _build_popup(row: pd.Series) -> str:
     acq_date   = row.get("date_str", "N/A")
     acq_time   = str(row.get("acq_time", "N/A")).zfill(4)
     intensity  = row.get("intensity", "N/A")
-    daynight   = row.get("daynight_label", "N/A")
+    daynight   = row.get("daynight_label", "N/A").replace("[Day] ", "").replace("[Night] ", "")
     lat        = round(row["latitude"],  4)
     lon        = round(row["longitude"], 4)
+    city       = row.get("city", "Unknown")
+    region     = row.get("region", "Unknown")
 
     time_str = f"{acq_time[:2]}:{acq_time[2:]}" if len(acq_time) == 4 else acq_time
 
     color = INTENSITY_COLORS.get(intensity, "#FF4500")
-    emoji = {"Very Low": "🟡", "Low": "🟠", "Moderate": "🔴",
-             "High": "🔴", "Extreme": "🟣"}.get(intensity, "🔥")
 
     return f"""
-    <div style="font-family:'Segoe UI',sans-serif;min-width:220px;color:#111">
+    <div style="font-family:'Roboto', 'Open Sans', sans-serif;min-width:240px;color:#111">
       <div style="background:{color};color:#fff;padding:8px 12px;border-radius:6px 6px 0 0;
                   font-weight:700;font-size:14px">
-        {emoji} {intensity} Intensity Fire
+        {intensity} Intensity Fire
       </div>
       <div style="padding:10px 12px;background:#f9f9f9;border-radius:0 0 6px 6px;
                   border:1px solid #ddd;border-top:none">
         <table style="width:100%;border-collapse:collapse;font-size:12px">
-          <tr><td style="color:#555;padding:3px 0">📍 Location</td>
+          <tr><td style="color:#555;padding:3px 0">Region</td>
+              <td style="text-align:right;font-weight:600">{city}, {region}</td></tr>
+          <tr><td style="color:#555;padding:3px 0">Coordinates</td>
               <td style="text-align:right;font-weight:600">{lat}°N, {lon}°E</td></tr>
-          <tr><td style="color:#555;padding:3px 0">🔥 FRP</td>
+          <tr><td style="color:#555;padding:3px 0">FRP</td>
               <td style="text-align:right;font-weight:600">{frp} MW</td></tr>
-          <tr><td style="color:#555;padding:3px 0">🌡️ Brightness</td>
+          <tr><td style="color:#555;padding:3px 0">Brightness</td>
               <td style="text-align:right;font-weight:600">{brightness} K</td></tr>
-          <tr><td style="color:#555;padding:3px 0">📡 Satellite</td>
+          <tr><td style="color:#555;padding:3px 0">Satellite</td>
               <td style="text-align:right;font-weight:600">{satellite}</td></tr>
-          <tr><td style="color:#555;padding:3px 0">📅 Date</td>
+          <tr><td style="color:#555;padding:3px 0">Date</td>
               <td style="text-align:right;font-weight:600">{acq_date}</td></tr>
-          <tr><td style="color:#555;padding:3px 0">⏰ Time (UTC)</td>
+          <tr><td style="color:#555;padding:3px 0">Time (UTC)</td>
               <td style="text-align:right;font-weight:600">{time_str}</td></tr>
-          <tr><td style="color:#555;padding:3px 0">✅ Confidence</td>
+          <tr><td style="color:#555;padding:3px 0">Confidence</td>
               <td style="text-align:right;font-weight:600">{confidence}</td></tr>
           <tr><td style="color:#555;padding:3px 0">{daynight}</td>
               <td></td></tr>
@@ -263,7 +265,7 @@ def _add_legend(m: folium.Map) -> None:
         color: #fff; box-shadow: 0 8px 32px rgba(0,0,0,0.5);">
       <div style="font-weight:700;font-size:13px;margin-bottom:10px;
                   letter-spacing:.5px;color:#FF9A3C">
-        🔥 FIRE INTENSITY (FRP)
+        FIRE INTENSITY (FRP)
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;font-size:12px">
         <div><span style="display:inline-block;width:12px;height:12px;border-radius:50%;

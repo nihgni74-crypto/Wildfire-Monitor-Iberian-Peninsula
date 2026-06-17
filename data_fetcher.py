@@ -11,7 +11,8 @@ import numpy as np
 import io
 import os
 import logging
-from datetime import datetime, timedelta
+import reverse_geocoder as rg
+from datetime import timedelta, datetime
 from dotenv import load_dotenv
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
@@ -27,12 +28,8 @@ NASA_API_KEY = os.getenv("NASA_FIRMS_API_KEY", "DEMO_KEY")
 
 # Bounding boxes: [West, South, East, North]
 REGIONS = {
-    "Spain + Portugal": "-9.5,35.8,4.5,43.9",
     "Spain only":       "-9.5,35.8,4.5,43.9",
-    "Portugal only":    "-9.5,36.9,-6.2,42.2",
     "Iberian Peninsula + Balearics": "-9.5,35.0,4.5,44.0",
-    "Mediterranean Basin": "-5.0,35.0,35.0,47.0",
-    "Europe (Wide)":    "-12.0,34.0,32.0,71.0",
 }
 
 SENSORS = {
@@ -106,7 +103,7 @@ def fetch_fire_data(
         log.info("No API key found - using demo data")
         return _build_demo_df()
 
-    bbox   = REGIONS.get(region_key, REGIONS["Spain + Portugal"])
+    bbox   = REGIONS.get(region_key, REGIONS["Spain only"])
     sensor = SENSORS.get(sensor_key, SENSORS["VIIRS SNPP (High Resolution)"])
     url    = f"{BASE_URL}/{key}/{sensor}/{bbox}/{days}"
 
@@ -196,6 +193,18 @@ def _enrich(df: pd.DataFrame) -> pd.DataFrame:
 
     # ── Drop NaN lat/lon ───────────────────────────────────────────
     df = df.dropna(subset=["latitude", "longitude"])
+    
+    # ── Reverse Geocoding (City & Region) ──────────────────────────
+    if not df.empty and "latitude" in df.columns and "longitude" in df.columns:
+        coords = list(zip(df["latitude"], df["longitude"]))
+        try:
+            results = rg.search(coords)
+            df["city"] = [res.get("name", "Unknown") for res in results]
+            df["region"] = [res.get("admin1", "Unknown") for res in results]
+        except Exception as e:
+            log.warning("Reverse geocoding failed: %s", e)
+            df["city"] = "Unknown"
+            df["region"] = "Unknown"
 
     return df.reset_index(drop=True)
 

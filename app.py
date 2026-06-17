@@ -1,8 +1,8 @@
 """
-🔥 Wildfire Monitor – Iberian Peninsula
+Wildfire Monitor – Iberian Peninsula
 Real-Time Active Fire Dashboard using NASA FIRMS API
 -----------------------------------------------------
-Author : Niloofar (your name here)
+Author : Niloofar
 Data   : NASA FIRMS (VIIRS / MODIS) – https://firms.modaps.eosdis.nasa.gov
 """
 
@@ -23,6 +23,7 @@ from charts import (
     hourly_polar,
     top_fires_table,
 )
+from forecasting import forecast_hotspots
 from streamlit_folium import st_folium
 
 # ══════════════════════════════════════════════════════════════════
@@ -30,14 +31,14 @@ from streamlit_folium import st_folium
 # ══════════════════════════════════════════════════════════════════
 
 st.set_page_config(
-    page_title="🔥 Wildfire Monitor – Iberian Peninsula",
-    page_icon="🔥",
+    page_title="Wildfire Monitor – Iberian Peninsula",
+    page_icon="🌍",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
         "Get Help":    "https://firms.modaps.eosdis.nasa.gov/api/",
         "Report a bug": None,
-        "About":       "🔥 Real-time wildfire monitoring dashboard powered by NASA FIRMS & Streamlit.",
+        "About":       "Real-time wildfire monitoring dashboard powered by NASA FIRMS & Streamlit.",
     },
 )
 
@@ -48,11 +49,11 @@ st.set_page_config(
 st.markdown("""
 <style>
   /* ── Google Fonts ─────────────────────────────────────────── */
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@400;600;700&display=swap');
 
   /* ── Global ───────────────────────────────────────────────── */
   html, body, [class*="css"] {
-    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-family: 'Roboto', 'Open Sans', sans-serif;
     background-color: #080C14;
     color: #E8EAF0;
   }
@@ -199,7 +200,6 @@ st.markdown("""
 with st.sidebar:
     st.markdown("""
     <div style="text-align:center;padding:16px 0 8px">
-      <div style="font-size:40px">🔥</div>
       <div style="font-size:16px;font-weight:800;color:#FF9A3C;letter-spacing:.5px">
         WILDFIRE MONITOR
       </div>
@@ -210,7 +210,7 @@ with st.sidebar:
     <hr style="border-color:rgba(255,107,53,0.2);margin:12px 0">
     """, unsafe_allow_html=True)
 
-    st.markdown("#### 🌍 Region")
+    st.markdown("#### Region")
     region_key = st.selectbox(
         "Select Region",
         options=list(REGIONS.keys()),
@@ -218,7 +218,7 @@ with st.sidebar:
         label_visibility="collapsed",
     )
 
-    st.markdown("#### 📡 Sensor")
+    st.markdown("#### Sensor")
     sensor_key = st.selectbox(
         "Select Sensor",
         options=list(SENSORS.keys()),
@@ -226,10 +226,10 @@ with st.sidebar:
         label_visibility="collapsed",
     )
 
-    st.markdown("#### 📅 Days of Data")
+    st.markdown("#### Days of Data")
     days = st.slider("Days back", min_value=1, max_value=10, value=7, step=1)
 
-    st.markdown("#### 🗺️ Map Style")
+    st.markdown("#### Map Style")
     map_style = st.radio(
         "Map style",
         ["Heatmap", "Markers", "Clusters"],
@@ -237,7 +237,7 @@ with st.sidebar:
         label_visibility="collapsed",
     )
 
-    st.markdown("#### 🎨 Basemap")
+    st.markdown("#### Basemap")
     basemap = st.selectbox(
         "Basemap",
         ["CartoDB Dark", "CartoDB Light", "OpenStreetMap", "Esri Satellite"],
@@ -245,7 +245,7 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    st.markdown("#### 🔑 NASA API Key")
+    st.markdown("#### NASA API Key")
     api_key_input = st.text_input(
         "API Key (optional)",
         value="",
@@ -263,7 +263,7 @@ with st.sidebar:
     )
 
     st.markdown("---")
-    fetch_btn = st.button("🔄  Fetch / Refresh Data", use_container_width=True)
+    fetch_btn = st.button("Fetch / Refresh Data", use_container_width=True)
 
     st.markdown("---")
     st.markdown("""
@@ -273,9 +273,9 @@ with st.sidebar:
       • Near-real-time (≤3h lag)<br>
       • Resolution: 375m (VIIRS)<br><br>
       <b style="color:#FF9A3C">Built with</b><br>
-      🐍 Python · Streamlit<br>
-      🗺️ Folium · Plotly<br>
-      🔥 NASA FIRMS API
+      Python · Streamlit<br>
+      Folium · Plotly<br>
+      NASA FIRMS API
     </div>
     """, unsafe_allow_html=True)
 
@@ -298,7 +298,7 @@ if "selected_date" not in st.session_state:
 
 # Auto-load on first visit or manual refresh
 if st.session_state.df is None or fetch_btn:
-    with st.spinner("🛰️ Fetching fire data from NASA FIRMS…"):
+    with st.spinner("Fetching fire data from NASA FIRMS…"):
         key = api_key_input.strip() if api_key_input.strip() else None
         df = fetch_fire_data(
             region_key=region_key,
@@ -322,17 +322,17 @@ last_str = last_t.strftime("%d %b %Y  %H:%M:%S UTC") if last_t else "—"
 
 st.markdown(f"""
 <div class="hero-banner">
-  <div class="hero-title">🔥 Wildfire Monitor – Iberian Peninsula</div>
+  <div class="hero-title">Wildfire Monitor – Iberian Peninsula</div>
   <div class="hero-subtitle">
     Real-time active fire detection powered by NASA FIRMS satellite data
     (VIIRS 375m · MODIS 1km)
   </div>
   <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:14px">
     <div class="hero-badge"><span class="live-dot"></span> LIVE DATA</div>
-    <div class="hero-badge">📡 {sensor_key.split("(")[0].strip()}</div>
-    <div class="hero-badge">🌍 {region_key}</div>
-    <div class="hero-badge">📅 Last {days} days</div>
-    <div class="hero-badge">🕐 Updated: {last_str}</div>
+    <div class="hero-badge">{sensor_key.split("(")[0].strip()}</div>
+    <div class="hero-badge">{region_key}</div>
+    <div class="hero-badge">Last {days} days</div>
+    <div class="hero-badge">Updated: {last_str}</div>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -340,10 +340,9 @@ st.markdown(f"""
 # Demo data warning
 if not api_key_input.strip():
     st.info(
-        "📋 **Demo Mode** – Showing sample data. "
+        "Demo Mode – Showing sample data. "
         "Enter your free [NASA FIRMS API key](https://firms.modaps.eosdis.nasa.gov/api/area/) "
-        "in the sidebar to load real satellite data.",
-        icon="ℹ️",
+        "in the sidebar to load real satellite data."
     )
 
 
@@ -355,17 +354,17 @@ stats = compute_stats(df)
 
 col1, col2, col3, col4, col5, col6 = st.columns(6)
 with col1:
-    st.metric("🔥 Total Hotspots",   f"{stats['total']:,}")
+    st.metric("Total Hotspots",   f"{stats['total']:,}")
 with col2:
-    st.metric("⚡ Mean FRP",         f"{stats['frp_mean']} MW")
+    st.metric("Mean FRP",         f"{stats['frp_mean']} MW")
 with col3:
-    st.metric("🌡️ Peak FRP",        f"{stats['frp_max']} MW")
+    st.metric("Peak FRP",        f"{stats['frp_max']} MW")
 with col4:
-    st.metric("⚠️ High/Extreme",     f"{stats['high_pct']}%")
+    st.metric("High/Extreme",     f"{stats['high_pct']}%")
 with col5:
-    st.metric("📅 Days Covered",     f"{stats['days_span']}")
+    st.metric("Days Covered",     f"{stats['days_span']}")
 with col6:
-    st.metric("🌙 Nighttime",        f"{stats['night_pct']}%")
+    st.metric("Nighttime",        f"{stats['night_pct']}%")
 
 st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
@@ -376,10 +375,10 @@ st.markdown("<div style='height:8px'></div>", unsafe_allow_html=True)
 
 if "date_str" in df.columns and df["date_str"].nunique() > 1:
     available_dates = sorted(df["date_str"].unique())
-    all_label = "📅 All Dates"
+    all_label = "All Dates"
     date_options = [all_label] + available_dates
 
-    st.markdown('<div class="section-title">📅 Filter by Date</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Filter by Date</div>', unsafe_allow_html=True)
     selected_date_option = st.select_slider(
         "Date",
         options=date_options,
@@ -405,11 +404,12 @@ st.markdown(
 # MAIN TABS
 # ══════════════════════════════════════════════════════════════════
 
-tab_map, tab_charts, tab_data, tab_about = st.tabs([
-    "🗺️  Interactive Map",
-    "📊  Analytics",
-    "📋  Raw Data",
-    "ℹ️  About",
+tab_map, tab_charts, tab_forecast, tab_data, tab_about = st.tabs([
+    "Interactive Map",
+    "Analytics",
+    "Predictive Analytics",
+    "Raw Data",
+    "About",
 ])
 
 
@@ -417,7 +417,7 @@ tab_map, tab_charts, tab_data, tab_about = st.tabs([
 # TAB 1 – MAP
 # ─────────────────────────────────────────
 with tab_map:
-    st.markdown('<div class="section-title">🗺️ Interactive Fire Map</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Interactive Fire Map</div>', unsafe_allow_html=True)
 
     if map_df.empty:
         st.warning("No hotspots found for the selected filters.")
@@ -444,7 +444,7 @@ with tab_map:
 # TAB 2 – ANALYTICS
 # ─────────────────────────────────────────
 with tab_charts:
-    st.markdown('<div class="section-title">📊 Fire Analytics & Statistics</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Fire Analytics & Statistics</div>', unsafe_allow_html=True)
 
     # Row 1: Bar + Donut
     r1c1, r1c2 = st.columns([3, 2])
@@ -464,7 +464,7 @@ with tab_charts:
         st.plotly_chart(hourly_polar(df), use_container_width=True)
 
     # Top 10 table
-    st.markdown('<div class="section-title">🏆 Top 10 Most Intense Fires</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Top 10 Most Intense Fires</div>', unsafe_allow_html=True)
     top_df = top_fires_table(df)
 
     # Style the table
@@ -488,10 +488,29 @@ with tab_charts:
 
 
 # ─────────────────────────────────────────
+# TAB 2.5 – FORECASTING
+# ─────────────────────────────────────────
+with tab_forecast:
+    st.markdown('<div class="section-title">Predictive Hotspot Analytics</div>', unsafe_allow_html=True)
+    st.markdown(
+        "<div style='font-size:13px;color:#8892A4;margin-bottom:16px;max-width:800px;line-height:1.6'>"
+        "Using Facebook's <b>Prophet</b> time-series forecasting algorithm, this module predicts the daily fire "
+        "hotspot counts for the next 90 days. "
+        "<i>Note: If the loaded dataset covers less than 30 days, the model automatically simulates historical seasonal data "
+        "to demonstrate long-term forecasting capabilities.</i>"
+        "</div>",
+        unsafe_allow_html=True,
+    )
+    
+    with st.spinner("Running forecasting model (Prophet)…"):
+        forecast_fig = forecast_hotspots(df, days_to_predict=90)
+        st.plotly_chart(forecast_fig, use_container_width=True)
+
+# ─────────────────────────────────────────
 # TAB 3 – RAW DATA
 # ─────────────────────────────────────────
 with tab_data:
-    st.markdown('<div class="section-title">📋 Raw Fire Data</div>', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">Raw Fire Data</div>', unsafe_allow_html=True)
 
     # Filter controls
     fc1, fc2, fc3 = st.columns(3)
@@ -509,7 +528,7 @@ with tab_data:
                 "Day/Night",
                 options=["D", "N"],
                 default=["D", "N"],
-                format_func=lambda x: "☀️ Day" if x == "D" else "🌙 Night",
+                format_func=lambda x: "Day" if x == "D" else "Night",
             )
         else:
             dn_filter = ["D", "N"]
@@ -532,7 +551,7 @@ with tab_data:
     # Download button
     csv = filtered.to_csv(index=False).encode("utf-8")
     st.download_button(
-        label="⬇️  Download CSV",
+        label="Download CSV",
         data=csv,
         file_name=f"wildfire_iberia_{datetime.now().strftime('%Y%m%d_%H%M')}.csv",
         mime="text/csv",
@@ -620,12 +639,12 @@ st.markdown("""
   border-top:1px solid rgba(255,107,53,0.12);
   font-size:12px; color:#8892A4; line-height:1.8
 ">
-  🔥 <b style="color:#FF9A3C">Wildfire Monitor</b> &nbsp;|&nbsp;
+  <b style="color:#FF9A3C">Wildfire Monitor</b> &nbsp;|&nbsp;
   Data: <a href="https://firms.modaps.eosdis.nasa.gov" style="color:#FF9A3C" target="_blank">NASA FIRMS</a>
   &nbsp;|&nbsp;
   VIIRS / MODIS Satellite Detection
   &nbsp;|&nbsp;
-  Built with 🐍 Python & Streamlit
+  Built with Python & Streamlit
   <br>
   <span style="font-size:10px;color:#4A5568">
     This tool is for educational and research purposes. Always consult official emergency services for real fire alerts.
