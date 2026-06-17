@@ -479,7 +479,7 @@ with tab_charts:
         return colors.get(val, "")
 
     if "Intensity" in top_df.columns:
-        styled = top_df.style.applymap(
+        styled = top_df.style.map(
             highlight_intensity, subset=["Intensity"]
         ).format({"FRP (MW)": "{:.1f}", "Latitude": "{:.4f}", "Longitude": "{:.4f}"})
         st.dataframe(styled, use_container_width=True, hide_index=True)
